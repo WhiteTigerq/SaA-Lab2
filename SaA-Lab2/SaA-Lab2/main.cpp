@@ -22,6 +22,22 @@ void InsertSort(type* a,long n)
     }
 }
 
+template<class type>
+void BubbleSort(type* a, long n)
+{
+    for(long i=0;i<n-1;i++)
+        for(long j=n-1;j>i;j--)
+            if(a[j-1]>a[j]) Swap(a[j],a[j-1]);
+}
+
+template<class type>
+void Swap(type& x,type& y)
+{
+    type temp=x;
+    x=y;
+    y=temp;
+}
+
 int main(int argc, const char * argv[])
 {
     std::cout << "Hello, World!\n";
