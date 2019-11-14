@@ -7,9 +7,23 @@
 //
 
 #include <iostream>
+using namespace std;
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
+template<class type>
+void InsertSort(type* a,long n)
+{
+    for(long i=1;i<n;i++)
+    {
+        type x=a[i];
+        long j=i-1;
+        for(;j>=0 && a[j]>x;j--)
+            a[j+1]=a[j];
+        a[j+1]=x;
+    }
+}
+
+int main(int argc, const char * argv[])
+{
     std::cout << "Hello, World!\n";
     return 0;
 }
