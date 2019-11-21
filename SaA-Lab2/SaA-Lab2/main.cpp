@@ -12,10 +12,10 @@ using namespace std;
 
 void SwapElement(int* arr, int i)
 {
-    int help;
-    help = arr[i - 1];
+    int buff;
+    buff = arr[i - 1];
     arr[i - 1] = arr[i];
-    arr[i] = help;
+    arr[i] = buff;
 }
 
 int InsertSort(int* arr,int n){
@@ -30,76 +30,124 @@ int InsertSort(int* arr,int n){
     return count;
 }
 
-template<class type>
-void BubbleSort(type* a, long n) // пузырек
+int BubbleSort(int* a, int n) // пузырек
 {
-    for(long i=0;i<n-1;i++)
-        for(long j=n-1;j>i;j--)
-            if(a[j-1]>a[j]) Swap(a[j],a[j-1]);
+    unsigned count = 0;
+    for(int i=0;i<n-1;i++)
+    {
+        for(int j=n-1;j>i;j--)
+        {
+            count++;
+            if (a[j-1] > a[j])
+                SwapElement(a,j);
+        }
+    }
+    return count;
 }
 
-template<class type>
-void Swap(type& x,type& y) // вспомогательная функция
+unsigned BubbleSortv1(int* arr, short n)
 {
-    type temp=x;
-    x=y;
-    y=temp;
+    unsigned count = 0;
+    bool check;
+    for (int i = 0; i < n - 1; i++)
+    {
+        check = false;
+        for (int j = (n - 1); j > i; j--)
+        {
+            count++;
+            if (arr[j - 1] > arr[j])
+            {
+                SwapElement(arr, j);
+                check = true;
+            }
+        }
+        if (check == false)
+            break;
+    }
+    return count;
 }
 
-// Функция "просеивания" через кучу - формирование кучи
-void siftDown(int *numbers, int root, int bottom)
+unsigned BubbleSortv2(int* arr, short n)
 {
-  int maxChild; // индекс максимального потомка
-  int done = 0; // флаг того, что куча сформирована
-  // Пока не дошли до последнего ряда
+    unsigned count = 0;
+    int last_swaped_el_num;
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = (n - 1); j > i; j--)
+        {
+            count++;
+            if (arr[j - 1] > arr[j])
+            {
+                SwapElement(arr, j);
+                last_swaped_el_num = j - 1;
+            }
+            else last_swaped_el_num = j;
+        }
+        i = last_swaped_el_num;
+    }
+    return count;
+}
+
+int siftDown(int *numbers, int root, int bottom)
+{
+    int count = 0;
+  int maxChild;
+  int done = 0;
   while ((root * 2 <= bottom) && (!done))
   {
-    if (root * 2 == bottom)    // если мы в последнем ряду,
-      maxChild = root * 2;    // запоминаем левый потомок
-    // иначе запоминаем больший потомок из двух
+    if (root * 2 == bottom)
+      maxChild = root * 2;
     else if (numbers[root * 2] > numbers[root * 2 + 1])
       maxChild = root * 2;
     else
       maxChild = root * 2 + 1;
-    // если элемент вершины меньше максимального потомка
+      count++;
     if (numbers[root] < numbers[maxChild])
     {
-      int temp = numbers[root]; // меняем их местами
+      int temp = numbers[root];
       numbers[root] = numbers[maxChild];
       numbers[maxChild] = temp;
       root = maxChild;
     }
-    else // иначе
-      done = 1; // пирамида сформирована
+    else
+      done = 1;
   }
+    return count;
 }
-// Функция сортировки на куче
-void heapSort(int *numbers, int array_size)
+int heapSort(int *numbers, int array_size)
 {
-  // Формируем нижний ряд пирамиды
+    int count = 0;
   for (int i = (array_size / 2) - 1; i >= 0; i--)
-    siftDown(numbers, i, array_size - 1);
-  // Просеиваем через пирамиду остальные элементы
-  for (int i = array_size - 1; i >= 1; i--)
+    count += siftDown(numbers, i, array_size - 1);
+  for (int i = array_size - 1; i >= 1; i--, count++)
   {
     int temp = numbers[0];
     numbers[0] = numbers[i];
     numbers[i] = temp;
-    siftDown(numbers, 0, i - 1);
+    count += siftDown(numbers, 0, i - 1);
   }
+    return count;
 }
 
-void QuicksortHoar(int *mas, int first, int last) // Хоара
+int QuicksortHoar(int *mas, int first, int last) // Хоара
 {
     int mid, count;
+    int counts = 0;
     int f = first, l = last;
     mid = mas[(f + l) / 2]; //вычисление опорного элемента
     do
     {
-        while (mas[f]<mid) f++;
-        while (mas[l]>mid) l--;
+        while (mas[f]<mid){
+            f++;
+            counts++;
+        }
+        while (mas[l]>mid){
+            counts++;
+            l--;
+        }
         if (f <= l) //перестановка элементов
         {
+            counts++;
             count = mas[f];
             mas[f] = mas[l];
             mas[l] = count;
@@ -107,8 +155,57 @@ void QuicksortHoar(int *mas, int first, int last) // Хоара
             l--;
         }
     } while (f<l);
+    counts++;
     if (first<l) QuicksortHoar(mas, first, l);
+    counts++;
     if (f<last) QuicksortHoar(mas, f, last);
+    return counts;
+}
+
+int SortBySelection(int* arr, short n)
+{
+    int count = 0;
+    int value, key;
+    for (int i = 0; i < n - 1; i++)
+    {
+        value = arr[i];
+        key = i;
+        for (int j = i + 1; j < n; j++)
+        {
+            count++;
+            if (arr[j] < arr[key])
+                key = j;
+        }
+        count++;
+        if (key != i)
+        {
+            arr[i] = arr[key];
+            arr[key] = value;
+        }
+    }
+    return count;
+}
+
+unsigned ShellSort(int* arr, short n)
+{
+    unsigned count = 0;
+    int step = n / 2;
+    while (step > 0)
+    {
+        for (int i = 0; i < (n - step); i++)
+        {
+            if (arr[i] < arr[i + step])
+                count++;
+            for (int j = i; j >= 0 && arr[j] > arr[j + step]; j--, count++)
+            {
+                int temp = arr[j];
+                arr[j] = arr[j + step];
+                arr[j + step] = temp;
+            }
+        }
+        step /= 2;
+    }
+    return count;
 }
 
 void GetArray(int* arr, const short sz)
@@ -179,7 +276,161 @@ int main(int argc, const char * argv[])
         int* default_arr = new int[size];
         GetArray(default_arr, size);
         cin.clear();
-        cout << "Анализ сортировки вставками\n";
+//        cout << "Анализ сортировки вставками" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка вставками: " << InsertSort(ordered_arr, size);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка вставками: " << InsertSort(reordered_arr, size);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка вставками: " << InsertSort(disordered_arr, size);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+//        cout << "Анализ сортировки пузырьком" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSort(ordered_arr, size);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSort(reordered_arr, size);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSort(disordered_arr, size);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+//        cout << "Анализ сортировки пузырьком улучшенной версии 1" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSortv1(ordered_arr, size);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSortv1(reordered_arr, size);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSortv1(disordered_arr, size);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+//        cout << "Анализ сортировки пузырьком улучшенной версии 2" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSortv2(ordered_arr, size);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSortv2(reordered_arr, size);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка пузырьком: " << BubbleSortv2(disordered_arr, size);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+//        cout << "Анализ сортировки Хоара" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка Хоара: " << QuicksortHoar(ordered_arr, 0, size-1);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка Хоара: " << QuicksortHoar(reordered_arr, 0, size-1);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка Хоара: " << QuicksortHoar(disordered_arr, 0, size-1);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+//        cout << "Анализ сортировки выбором" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка выбором: " << SortBySelection(ordered_arr, size);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка выбором: " << SortBySelection(reordered_arr, size);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка выбором: " << SortBySelection(disordered_arr, size);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+//        cout << "Анализ сортировки Шелла" << endl;
+//        int *ordered_arr = new int[size];
+//        int *reordered_arr = new int[size];
+//        int *disordered_arr = new int[size];
+//        GetDisArray(default_arr, disordered_arr, size);
+//        GetOrderArray(disordered_arr, ordered_arr, size);
+//        GetReorderArray(ordered_arr, reordered_arr, size);
+//        cout << "Упорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка Шелла: " << ShellSort(ordered_arr, size);
+//        cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
+//        cout << "Сортировка Шелла: " << ShellSort(reordered_arr, size);
+//        cout << "\nНеупорядоченный массив размера " << size << ":\n";
+//        cout << "Сортировка Шелаа: " << ShellSort(disordered_arr, size);
+//        GetInfo (disordered_arr, size);
+//        cout << endl;
+//        GetInfo (ordered_arr, size);
+//        cout << endl;
+//        GetInfo (reordered_arr, size);
+//        cout << endl;
+//        delete[] ordered_arr;
+//        delete[] reordered_arr;
+//        delete[] disordered_arr;
+        cout << "Анализ сортировки пирамидой" << endl;
         int *ordered_arr = new int[size];
         int *reordered_arr = new int[size];
         int *disordered_arr = new int[size];
@@ -187,11 +438,11 @@ int main(int argc, const char * argv[])
         GetOrderArray(disordered_arr, ordered_arr, size);
         GetReorderArray(ordered_arr, reordered_arr, size);
         cout << "Упорядоченный массив размера " << size << ":\n";
-        cout << "Сортировка вставками: " << InsertSort(ordered_arr, size);
+        cout << "Сортировка пирамидой: " << heapSort(ordered_arr, size);
         cout << "\nУпорядоченный в обратном порядке массив размера " << size << ":\n";
-        cout << "Сортировка вставками: " << InsertSort(reordered_arr, size);
+        cout << "Сортировка пирамидой: " << heapSort(reordered_arr, size);
         cout << "\nНеупорядоченный массив размера " << size << ":\n";
-        cout << "Сортировка вставками: " << InsertSort(disordered_arr, size);
+        cout << "Сортировка пирамидой: " << heapSort(disordered_arr, size);
         GetInfo (disordered_arr, size);
         cout << endl;
         GetInfo (ordered_arr, size);
